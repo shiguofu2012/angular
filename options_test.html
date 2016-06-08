@@ -1,0 +1,25 @@
+<html>
+
+    <head>
+        <script src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    </head>
+
+    <div ng-app="app" ng-controller="selected">
+        <select ng-options="x for x in cities" ng-model="se" ng-click="popup()">
+
+        </select>
+        {{test}}
+    </div>
+    <script>
+        var app = angular.module('app', []);
+        app.controller("selected", function($scope){
+            $scope.mycity = "wuhan";
+            $scope.se = "wuhan"
+            //$scope.cities = [{"id": 1, "name": "beijing"}, {"id": 2, "name": "wuhan"}]
+            $scope.cities = ["wuhan", "beijing"];
+            $scope.popup = function(){
+                $scope.test = "OK"
+            }
+        })
+    </script>
+</html>
