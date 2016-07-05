@@ -1,0 +1,18 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular.min.js"></script>
+<script>
+	var app = angular.module("myApp", []);
+	app.controller('myctl', function($scope){
+		$scope.names = [{"name": "lining", "age": 18}, {"name": "lixing", "age": 12}]
+	})
+</script>
+</head>
+<body>
+<div ng-app="myApp" ng-controller="myctl">
+<table>
+<tr ng-repeat="x in names"><td>{{x.name}}</td><td>{{x.age}}</td></tr>
+</table>
+</body>
+</html>

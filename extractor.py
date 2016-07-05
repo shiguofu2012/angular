@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from lxml import html
+import requests
 
 templat = {
         "block": "//div[@class=\"msg_list_bd\"]",
@@ -44,10 +45,25 @@ def extract_link(dom, template):
     return result
 
 
+def down_article(link):
+    r = requests.get(link)
+    if r.ok:
+        return r.content
+    else:
+        return None
+
 if __name__ == "__main__":
     f = open("wuhan.html")
     content = f.read()
     f.close()
     dom = html.fromstring(content)
-    r = extract_link(dom, templat)
-    print r
+    #r = extract_link(dom, templat)
+    #print r
+    links = extract_link(dom, templat)
+    link = links[0].get("link")
+    article = down_article(link)
+    dom = html.fromstring(article)
+    print link
+    content = dom.xpath("//div[@id=\"js_cmt_mine\"]")
+    for i in content:
+        print i.xpath('.//h2/text()')[0]
