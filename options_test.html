@@ -5,8 +5,7 @@
     </head>
 
     <div ng-app="app" ng-controller="selected">
-        <select ng-options="x for x in cities" ng-model="se" ng-click="popup()">
-
+        <select ng-options="x for x in cities" ng-model="status" ng-init="wuhan">
         </select>
         {{test}}
     </div>
@@ -14,7 +13,7 @@
         var app = angular.module('app', []);
         app.controller("selected", function($scope){
             $scope.mycity = "wuhan";
-            $scope.se = "wuhan"
+            //$scope.se = "wuhan"
             //$scope.cities = [{"id": 1, "name": "beijing"}, {"id": 2, "name": "wuhan"}]
             $scope.cities = ["wuhan", "beijing"];
             $scope.popup = function(){

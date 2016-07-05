@@ -14,6 +14,7 @@ templat = {
 def extract_link(dom, template):
     result = []
     blocks = dom.xpath(templat["block"])
+    print blocks
     for block in blocks:
         t = block.xpath(templat['time'])
         articles = block.xpath(templat['subblock'])
@@ -39,12 +40,14 @@ def extract_link(dom, template):
         title = i.get("title", "")
         link = i.get("link", "")
         pic = i.get("thumb", '')
-        print pic
+        #print pic
+    return result
 
 
 if __name__ == "__main__":
-    f = open("test.html")
+    f = open("wuhan.html")
     content = f.read()
     f.close()
     dom = html.fromstring(content)
-    extract_link(dom, templat)
+    r = extract_link(dom, templat)
+    print r
