@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from lxml import html
 from process_article import get_text, get_pic
+from db.infodb import insert, save_pic
 import requests
 import uuid
 
@@ -18,7 +19,7 @@ templat = {
 newsTemplate = {
         "title": "//h2/text()",
         "content": "//div[@id=\"img-content\"]",
-        "pubDate": "",
+        "pubDate": ".//em[@id=\"post-date\"]/text()",
         "remove": ".//section[@label=\"powered by 135editor.com\"]/p[position() > last() - 18]&.//div[@class=\"rich_media_tool\"]"
         }
 
@@ -85,16 +86,19 @@ def extract(dom, template):
     article = {}
     tag_remove = template.get("remove", "")
     article['title'] = extract_item(dom, 'title', template)
+    pubDate = extract_item(dom, "pubDate", template)
+    article['pubDate'] = pubDate
     content = extract_item(dom, "content", template)
     text = ""
     remove_tag(content, tag_remove)
     pics = get_pic(content)
     for p in pics:
-        node = p.get("node")
+        node = p.pop("node")
         parent_node = node.getparent()
         parent_node.replace(node, html.fromstring(IMG_REP_STR % p.get("id")))
     text += get_text(content)
     article["content"] = text
+    save_pic(pics)
     return article
 
 
@@ -106,12 +110,14 @@ if __name__ == "__main__":
     #r = extract_link(dom, templat)
     #print r
     links = extract_link(dom, templat)
-    link = links[1].get("link")
-    article = down_article(link)
-    dom = html.fromstring(article)
-    print link
-    result = extract(dom, newsTemplate)
-    print result.get("content")
+    for link in links:
+        l = link.get("link")
+        article = down_article(l)
+        dom = html.fromstring(article)
+        result = extract(dom, newsTemplate)
+        result.update({"original_url": l, "image": link.get("thumb")})
+        insert(result)
+    #print result.get("pubDate")
     #content = dom.xpath("//div[@id=\"img-content\"]")[0]
     #remove_tag = content.xpath(
     #        ".//p[position() > 49] | .//div[@class=\"rich_media_tool\"]")

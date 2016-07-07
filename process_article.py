@@ -21,7 +21,10 @@ def get_text(dom):
     if dom.text:
         text += dom.text
     for d in dom:
-        t = get_text(d)
+        if d.tag == 'p':
+            t = d.xpath('string(.)') + '\n'
+        else:
+            t = get_text(d)
         text += t
     if is_paragraph:
         text = text + '\n'
