@@ -1,8 +1,9 @@
 
 
-var page = require('webpage').create()
-
-system = require('system')
+var page = require('webpage').create(),
+    fs = require("fs");
+page.settings.userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36";
+system = require('system');
 
 link = system.args[1];
 
@@ -11,7 +12,10 @@ page.open(link, function(status){
         console.log("failed");
     }
     else{
-        console.log(page.content);
+        f = fs.open("weixin.html", "w+");
+        f.write(page.content);
+        f.close();
+        page.render("a.png");
     }
     phantom.exit();
 })

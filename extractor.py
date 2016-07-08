@@ -4,15 +4,25 @@ from process_article import get_text, get_pic
 from db.infodb import insert, save_pic
 import requests
 import uuid
+import time
 
 IMG_REP_STR = "<div>&lte;picturestart--%s--pictureend&gte;</div>"
-templat = {
+pub_templat = {
         "block": "//div[@class=\"msg_list_bd\"]",
         "subblock": ".//div[@class=\"sub_msg_list\"]",
         "time": ".//p[@class=\"msg_date\"]",
         "title": ".//h4[@class=\"msg_title\"]/text()",
         "link": ".//a[@class=\"sub_msg_item redirect\"]/@hrefs",
         "picture": ".//span[@class=\"thumb\"]/img/@data-src"
+        }
+
+weixin_templat = {
+        "block": "//ul[@id=\"pc_0_subd\"]",
+        "subblock": ".//li",
+        "time": ".//span[@class=\"sc\"]",
+        "link": ".//h4/a/@href",
+        "title": ".//h4/a/text()",
+        "picture": ".//div[@class=\"wx-img-box\"]/a/img/@src",
         }
 
 
@@ -26,19 +36,18 @@ newsTemplate = {
 
 def extract_link(dom, template):
     result = []
-    blocks = dom.xpath(templat["block"])
-    print blocks
+    blocks = dom.xpath(template["block"])
     for block in blocks:
-        t = block.xpath(templat['time'])
-        articles = block.xpath(templat['subblock'])
+        t = block.xpath(template['time'])
+        articles = block.xpath(template['subblock'])
         for a in articles:
-            title = a.xpath(templat['title'])
+            title = a.xpath(template['title'])
             if title and isinstance(title, list):
                 title = title[0]
-            link = a.xpath(templat['link'])
+            link = a.xpath(template['link'])
             if link and isinstance(link, list):
                 link = link[0]
-            pic = a.xpath(templat['picture'])
+            pic = a.xpath(".//div[@class=\"wx-img-box\"]/a/img/@src")
             if pic and isinstance(pic, list):
                 pic = pic[0]
             if not pic:
@@ -102,21 +111,28 @@ def extract(dom, template):
     return article
 
 
-if __name__ == "__main__":
-    f = open("wuhan.html")
+def open_file(filename):
+    f = open(filename)
     content = f.read()
     f.close()
     dom = html.fromstring(content)
+    return dom
+
+
+if __name__ == "__main__":
+    dom = open_file("weixin.html")
     #r = extract_link(dom, templat)
     #print r
-    links = extract_link(dom, templat)
+    links = extract_link(dom, weixin_templat)
     for link in links:
-        l = link.get("link")
-        article = down_article(l)
-        dom = html.fromstring(article)
-        result = extract(dom, newsTemplate)
-        result.update({"original_url": l, "image": link.get("thumb")})
-        insert(result)
+        l = link.get("thumb")
+        print l
+        #article = down_article(l)
+        #dom = html.fromstring(article)
+        #result = extract(dom, newsTemplate)
+        #_id = time.time() * 1000
+        #result.update({"_id": _id, "original_url": l, "image": link.get("thumb")})
+        #insert(result)
     #print result.get("pubDate")
     #content = dom.xpath("//div[@id=\"img-content\"]")[0]
     #remove_tag = content.xpath(
