@@ -5,6 +5,8 @@ from db.infodb import insert, save_pic
 import requests
 import uuid
 import time
+import os
+import sys
 
 IMG_REP_STR = "<div>&lte;picturestart--%s--pictureend&gte;</div>"
 pub_templat = {
@@ -47,7 +49,7 @@ def extract_link(dom, template):
             link = a.xpath(template['link'])
             if link and isinstance(link, list):
                 link = link[0]
-            pic = a.xpath(".//div[@class=\"wx-img-box\"]/a/img/@src")
+            pic = a.xpath(template['picture'])
             if pic and isinstance(pic, list):
                 pic = pic[0]
             if not pic:
@@ -66,12 +68,16 @@ def extract_link(dom, template):
     return result
 
 
-def down_article(link):
-    r = requests.get(link)
-    if r.ok:
-        return r.content
+def down_article(link, dynamic=False):
+    if dynamic:
+        out = os.popen("phantomjs down.js %s" % link)
+        return out.read()
     else:
-        return None
+        r = requests.get(link)
+        if r.ok:
+            return r.content
+        else:
+            return None
 
 
 def remove_tag(dom, xpath_str):
@@ -120,10 +126,14 @@ def open_file(filename):
 
 
 if __name__ == "__main__":
-    dom = open_file("weixin.html")
+    #dom = open_file("wuhan.html")
     #r = extract_link(dom, templat)
     #print r
-    links = extract_link(dom, weixin_templat)
+    history = sys.argv[1]
+    out = os.popen("phantomjs down.js \"%s\"" % history)
+    content = out.read()
+    dom = html.fromstring(content)
+    links = extract_link(dom, pub_templat)
     for link in links:
         l = link.get("thumb")
         print l
