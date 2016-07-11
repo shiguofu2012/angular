@@ -5,7 +5,6 @@ var page = require('webpage').create(),
 //page.settings.userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36";
 system = require('system');
 page.viewportSize = {width: 480, height: 1000}
-log = fs.open("log", "w");
 //page.settings.loadImages = false;
 link = system.args[1];
 phantom.onError = function(msg, trace){
@@ -48,9 +47,8 @@ page.open(link, function(status){
             top = page.evaluate(get_height); 
             i++;
             page.scrollPosition = {top: top + 1, left: 0};
-            if(i >= 6){
+            if(i >= 5){
                 console.log(page.content);
-                log.close();
                 phantom.exit();
             }
         }, 300);

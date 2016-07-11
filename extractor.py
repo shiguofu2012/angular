@@ -1,21 +1,23 @@
 #!/usr/bin/python
 from lxml import html
-from process_article import get_text, get_pic
-from db.infodb import insert, save_pic
+from process_article import get_text, get_pic, downPic
+from db.infodb import insert, save_pic, get_OneImage
 import requests
 import uuid
 import time
 import os
 import sys
+import re
 
-IMG_REP_STR = "<div>&lte;picturestart--%s--pictureend&gte;</div>"
+IMG_REP_STR = "<div>&ltpicturestart--%s--pictureend&gt</div>"
+PATTERN_IMG = re.compile("&ltpicturestart--(.*?)--pictureend&gt")
 pub_templat = {
         "block": "//div[@class=\"msg_list_bd\"]",
         "subblock": ".//div[@class=\"sub_msg_list\"]",
         "time": ".//p[@class=\"msg_date\"]",
         "title": ".//h4[@class=\"msg_title\"]/text()",
         "link": ".//a[@class=\"sub_msg_item redirect\"]/@hrefs",
-        "picture": ".//span[@class=\"thumb\"]/img/@data-src"
+        "picture": [".//span[@class=\"thumb\"]/img/@data-src", ".//span[@class=\"thumb\"]/img/@data-src"]
         }
 
 weixin_templat = {
@@ -49,9 +51,16 @@ def extract_link(dom, template):
             link = a.xpath(template['link'])
             if link and isinstance(link, list):
                 link = link[0]
-            pic = a.xpath(template['picture'])
-            if pic and isinstance(pic, list):
-                pic = pic[0]
+            pic_temps = template['picture']
+            for t in pic_temps:
+                pic = a.xpath(t)
+                if pic and isinstance(pic, list):
+                    pic = pic[0]
+                    name = uuid.uuid4()
+                    name = ''.join(str(name).split("-"))
+                    pic = downPic(pic, name)
+                if pic:
+                    break
             if not pic:
                 print title
             tmp = {}
@@ -59,12 +68,6 @@ def extract_link(dom, template):
             tmp['link'] = link
             tmp['thumb'] = pic
             result.append(tmp)
-    print len(result)
-    for i in result:
-        title = i.get("title", "")
-        link = i.get("link", "")
-        pic = i.get("thumb", '')
-        #print pic
     return result
 
 
@@ -94,7 +97,8 @@ def extract_item(dom, item, template, multi=False):
     item_value = dom.xpath(template[item])
     if multi:
         return item_value
-    return item_value[0]
+    if item_value:
+        return item_value[0]
 
 
 def extract(dom, template):
@@ -125,6 +129,17 @@ def open_file(filename):
     return dom
 
 
+def get_thumbnail(content):
+    thum = PATTERN_IMG.search(content.get("content"))
+    if not thum:
+        return ""
+    _id = thum.group(1)
+    thum = get_OneImage(_id)
+    if not thum:
+        return ""
+    return thum.get("url")
+
+
 if __name__ == "__main__":
     #dom = open_file("wuhan.html")
     #r = extract_link(dom, templat)
@@ -134,15 +149,19 @@ if __name__ == "__main__":
     content = out.read()
     dom = html.fromstring(content)
     links = extract_link(dom, pub_templat)
+    result = []
     for link in links:
-        l = link.get("thumb")
-        print l
-        #article = down_article(l)
-        #dom = html.fromstring(article)
-        #result = extract(dom, newsTemplate)
-        #_id = time.time() * 1000
-        #result.update({"_id": _id, "original_url": l, "image": link.get("thumb")})
-        #insert(result)
+        l = link.get("link")
+        thum = link.get("thumb", "")
+        article = down_article(l)
+        dom = html.fromstring(article)
+        article_content = extract(dom, newsTemplate)
+        if not thum:
+            thum = get_thumbnail(article_content)
+        _id = int(time.time() * 1000)
+        article_content.update({"_id": _id, "original_url": l, "image": thum})
+        result.append(article_content)
+    insert(result)
     #print result.get("pubDate")
     #content = dom.xpath("//div[@id=\"img-content\"]")[0]
     #remove_tag = content.xpath(
