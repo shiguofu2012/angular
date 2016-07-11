@@ -4,14 +4,14 @@ import tornado.web
 from db.infodb import get_Articles
 
 
-class MainHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-        self.set_header('Access-Control-Max-Age', 1000)
-        self.set_header('Access-Control-Allow-Headers', '*')
-        self.set_header('Content-type', 'application/json')
+def set_default_headers(self):
+    self.set_header('Access-Control-Allow-Origin', '*')
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    self.set_header('Access-Control-Max-Age', 1000)
+    self.set_header('Access-Control-Allow-Headers', '*')
+    self.set_header('Content-type', 'application/json')
 
+class MainHandler(tornado.web.RequestHandler):
     def get(self):
         arts = get_Articles(0, 10)
         for art in arts:
@@ -22,12 +22,22 @@ class MainHandler(tornado.web.RequestHandler):
             for c in content_list:
                 content += "<p>%s</p>" % c
             art['content'] = content
-        self.set_default_headers()
+        set_default_headers(self)
         self.write({"articles": arts})
+
+
+class TestHandler(tornado.web.RequestHandler):
+    def get(self):
+        set_default_headers(self)
+        f = open("test.html")
+        content = f.read()
+        f.close()
+        return content
 
 
 application = tornado.web.Application([
     (r"/", MainHandler),
+    (r"/test.html", TestHandler),
     ])
 
 
