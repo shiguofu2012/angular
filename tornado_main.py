@@ -44,14 +44,23 @@ def ship_article(art):
 def ship_article_list(art):
     title = art.get("title", "")
     image = art.get("image", "")
+    pubDate = art.get("pubDate")
     _id = art.get("_id")
     url = art.get("url")
-    return {"title": title, "id": _id, "image": image}
+    return {"title": title, "id": _id, "image": image, "pubDate": pubDate}
 
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        arts = get_Articles(0, 10)
+        page = self.get_argument("page", 1)
+        count = self.get_argument("count", 10)
+        try:
+            page = int(page)
+            count = int(count)
+        except Exception as e:
+            page = 1
+            count = 10
+        arts = get_Articles((page - 1) * count, count)
         result = []
         for art in arts:
             info = ship_article_list(art)
@@ -73,8 +82,8 @@ class TestHandler(tornado.web.RequestHandler):
 
 
 application = tornado.web.Application([
-    (r"/", MainHandler),
-    (r"/(.*?)", TestHandler),
+    (r"/article/list", MainHandler),
+    (r"/article/(.*?)", TestHandler),
     ])
 
 

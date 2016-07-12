@@ -11,7 +11,7 @@ def save_pic(pic_list):
 
 
 def get_Articles(skip, count):
-    cur = Article.info.find().skip(skip).limit(count)
+    cur = Article.info.find().sort([("_id", -1)]).skip(skip).limit(count)
     return [i for i in cur]
 
 

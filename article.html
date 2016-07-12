@@ -1,29 +1,9 @@
 
 <html>
-<script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.8.0.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<script type="text/javascript" src="jquery-1.8.0.js"></script>
     <script>
-        var host = "http://192.168.50.128:8888/";
-        function getParameter(name)
-        {
-            var p = window.location.search;
-            var index = p.indexOf(name);
-            if(index != -1)
-            {
-                var paraEnd = p.indexOf("&", index);
-                if(paraEnd == -1)
-                {
-                    paraEnd = p.length - 1;
-                }
-                var str = p.substr(index, paraEnd);
-                var paras = str.split("=");
-                if(paras.length != 2)
-                {
-                    return null;
-                }
-                return paras[1];
-            }
-            return null;
-        }
+        var host = "http://192.168.50.128:8888/article/";
         $(document).ready(function(){
             var p = getParameter("id");
             htmlobj = $.ajax({

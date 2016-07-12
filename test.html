@@ -1,24 +1,95 @@
 <html>
-<script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.8.0.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+    #content img {width:200px;height:200px;margin: 20px}
+    #content a {
+        text-decoration:none;
+        font-size: 3.5em;
+        color: black;
+        font-family: Monospace;
+        position:absolute;
+        left:250px;
+        margin: 20px;
+        width: 450px;
+    }
+    #day {font-size: 6em;}
+    #month {font-size: 2em;}
+    #pubDate {
+        float: left;
+        margin: 10px;
+        position: relative;
+        left: 20px;
+        top: 50px;
+    }
+    #article {
+        //border: 10px solid #0000FF;
+        float: left;
+        background:#f3ffec;
+        width: 710px;
+        margin: 10px;
+        position: relative;
+        left: 20px;
+    }
+</style>
+<script type="text/javascript" src="common.js"></script>
+<script type="text/javascript" src="jquery-1.8.0.js"></script>
     <script>
-        var host = "http://192.168.50.128:8888/";
+        var host = "http://192.168.50.128:8888/article/list";
         var host_article = "http://192.168.50.128/angular/article.html"
-        $(document).ready(function(){
+        var p = 0, c = 0, send = true;
+        function get_data(page, count)
+        {
             htmlobj = $.ajax({
                 dataType: "json",
-                url: host,
-                async: false});
+                url: host + "?page=" + page + "&count=" + count,
+                async: false,
+                success: function(){p = page; c = count;}
+            });
             data = $.parseJSON(htmlobj.responseText).articles
+            return data;
+        };
+        function renderHtml(data)
+        {
             var h = "";
             for(i in data){
                 img_html = "<img src=" + data[i].image + ">";
                 _id = data[i].id;
                 url = host_article + "?id=" + _id;
-                h += "<div>" + img_html + "<a href=" + url + ">" + data[i].title + "</a></div>"
+                pubdate = data[i].pubDate;
+                pubdate_list = pubdate.split('-')
+                day = pubdate_list[2]
+                month = pubdate_list[1]
+                pubdate = "<div id='pubDate'><b id='day'>" + day + "</b><b id='month'>" + month + "月" + "</b></div>"
+                h += pubdate + "<div id='article'>" + img_html  + "<a href=" + url + ">" + data[i].title + "</a></div>"
             };
-            $("#content").html(h);
-    });
+            $("#content").append(h);
+        };
+        $(document).ready(function(){
+            page = getParameter("page");
+            if(isNull(page))
+                page = 1;
+            count = getParameter("count");
+            if(isNull(count))
+                count = 10;
+            data = get_data(page, count);
+            renderHtml(data);
+        });
+        $(window).scroll(function(){
+            scroll = document.documentElement.offsetHeight - (document.body.scrollTop + document.body.clientHeight);
+            if(send && scroll < 400)
+            {
+                data = get_data(parseInt(p) + 1, c);
+                if(isNull(data))
+                {
+                    send = false;
+                    $("#No-more").css("display", "block");
+                }
+                else
+                    renderHtml(data);
+            }
+        });
     </script>
     <div id="content">
     </div>
+    <p id="No-more" style="display:none">No more data</p>
 </html>
