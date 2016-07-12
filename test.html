@@ -1,17 +1,20 @@
 <html>
 <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.8.0.js"></script>
     <script>
+        var host = "http://192.168.50.128:8888/";
+        var host_article = "http://192.168.50.128/angular/article.html"
         $(document).ready(function(){
             htmlobj = $.ajax({
                 dataType: "json",
-                url: "http://192.168.50.128:8888/",
+                url: host,
                 async: false});
             data = $.parseJSON(htmlobj.responseText).articles
             var h = "";
             for(i in data){
-                console.log(i);
-                img_html = "<img src=" + data[i].image + ">"
-                h += "<div>" + img_html + "<a href=" + data[i].original_url + ">" + data[i].title + "</a></div>"
+                img_html = "<img src=" + data[i].image + ">";
+                _id = data[i].id;
+                url = host_article + "?id=" + _id;
+                h += "<div>" + img_html + "<a href=" + url + ">" + data[i].title + "</a></div>"
             };
             $("#content").html(h);
     });

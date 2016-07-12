@@ -7,7 +7,7 @@ def insert(article):
 
 
 def save_pic(pic_list):
-    Article.Image.insert(pic_list)
+    Article.image.insert(pic_list)
 
 
 def get_Articles(skip, count):
@@ -16,11 +16,16 @@ def get_Articles(skip, count):
 
 
 def get_OneArticle(_id):
-    return Article.info.find_one({"id": _id})
+    return Article.info.find_one({"_id": _id})
 
 
 def get_OneImage(_id):
-    return Article.Image.find_one({"id": _id})
+    return Article.image.find_one({"id": _id})
+
+
+def get_ImageByCond(cond):
+    cur = Article.image.find(cond)
+    return [i for i in cur]
 
 if __name__ == "__main__":
     print len(get_Articles(0, 10))
