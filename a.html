@@ -1,0 +1,76 @@
+<html>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style>
+        #article img {
+            width: 200px;
+            height: 200px;
+        }
+        #pubDate {
+            float: left;
+        }
+        #article {
+            float: left;
+        }
+        #container {
+            clear: both;
+            float: left;
+        }
+        #article a {
+            position: absolute;
+            left: 300px;
+            font-size: 3em;
+            width: 500px;
+        }
+    </style>
+    <script type="text/javascript" src="jquery-3.1.0.min.js"></script>
+    <script type="text/javascript" src="jquery.tmpl.js"></script>
+    <script id="demo" type="text/x-jquery-tmpl">
+        <div id="container">
+            <div id="pubDate">
+                <b id="day">${day}</b>
+                <b id="month">${month}月</b>
+            </div>
+            <div id="article">
+                <img src=${image}>
+                <a href=${url}>${title}</a>
+            </div>
+        </div>
+    </script>
+    <script type="text/javascript">
+        var host = "http://192.168.50.128:8888/article/list";
+        var host_article = "http://192.168.50.128/angular/article.html"
+        function get_data(page, count)
+        {
+            htmlobj = $.ajax({
+                dataType: "json",
+                url: host + "?page=" + page + "&count=" + count,
+                async: false,
+                success: function(){p = page; c = count;}
+            });
+            data = $.parseJSON(htmlobj.responseText).articles
+            return data;
+        };
+        $(document).ready(function(){
+            page = 1;
+            count = 10;
+            data = get_data(page, count);
+            for(i in data)
+            {
+                id = data[i].id;
+                pubdate = data[i].pubDate;
+                pubdate_list = pubdate.split('-');
+                day = pubdate_list[2];
+                month = pubdate_list[1]
+                data[i].day = day;
+                data[i].month = month;
+                data[i].url = host_article + "?id=" + id;
+            };
+            $("#demo").tmpl(data).appendTo("#content");
+        });
+    </script>
+    <body>
+        <title>最新文章</title>
+        <div id="content">
+        </div>
+    </body>
+</html>

@@ -1,16 +1,23 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <style>
-    #content img {width:200px;height:200px;margin: 20px}
+    #content img {
+        width:150px;
+        height:150px;
+        margin: 20px;
+        moz-box-shadow:3px 3px 4px #000;
+        webkit-box-shadow:3px 3px 4px #000;
+        box-shadow:3px 3px 4px #000;
+    }
     #content a {
         text-decoration:none;
         font-size: 3.5em;
         color: black;
         font-family: Monospace;
         position:absolute;
-        left:250px;
+        left:180px;
         margin: 20px;
-        width: 450px;
+        width: 510px;
     }
     #day {font-size: 6em;}
     #month {font-size: 2em;}
@@ -20,15 +27,29 @@
         position: relative;
         left: 20px;
         top: 50px;
+        width: 170px;
     }
     #article {
         //border: 10px solid #0000FF;
         float: left;
-        background:#f3ffec;
+        background: #F5F5F5;
         width: 710px;
         margin: 10px;
         position: relative;
         left: 20px;
+    }
+    #container {
+        background: #FFFFFF; 
+        float: left;
+        clear: both;
+    }
+    #No-more {
+        display: none;
+    }
+    #footer {
+        width: 920px;
+        text-align: center;
+        clear: both;
     }
 </style>
 <script type="text/javascript" src="common.js"></script>
@@ -51,6 +72,7 @@
         function renderHtml(data)
         {
             var h = "";
+            var last_day = "";
             for(i in data){
                 img_html = "<img src=" + data[i].image + ">";
                 _id = data[i].id;
@@ -58,9 +80,17 @@
                 pubdate = data[i].pubDate;
                 pubdate_list = pubdate.split('-')
                 day = pubdate_list[2]
-                month = pubdate_list[1]
-                pubdate = "<div id='pubDate'><b id='day'>" + day + "</b><b id='month'>" + month + "月" + "</b></div>"
-                h += pubdate + "<div id='article'>" + img_html  + "<a href=" + url + ">" + data[i].title + "</a></div>"
+                month = pubdate_list[1] + "月"
+                if(last_day == pubdate)
+                {
+                    day = month = "";
+                }
+                else
+                {
+                    last_day = pubdate;
+                }
+                pubdate = "<title>最新文章</title><div id='pubDate'><b id='day'>" + day + "</b><b id='month'>" + month + "</b></div>";
+                h += "<div id='container'>" + pubdate + "<div id='article'>" + img_html  + "<a href=" + url + ">" + data[i].title + "</a></div>" + "</div>"
             };
             $("#content").append(h);
         };
@@ -89,7 +119,11 @@
             }
         });
     </script>
-    <div id="content">
-    </div>
-    <p id="No-more" style="display:none">No more data</p>
+    <body>
+        <div id="content">
+        </div>
+        <div id="footer">
+            <p id="No-more">No more data</p>
+        </div>
+    </body>
 </html>

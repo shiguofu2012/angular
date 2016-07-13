@@ -116,6 +116,8 @@ def extract(dom, template):
         parent_node = node.getparent()
         parent_node.replace(node, html.fromstring(IMG_REP_STR % p.get("id")))
     text += get_text(content)
+    text = text.replace("<", "&lt")
+    text = text.replace(">", "&gt")
     article["content"] = text
     save_pic(pics)
     return article

@@ -1,5 +1,34 @@
 
 <html>
+    <style>
+        #content {
+            //border: 20px solid #0000FF;
+            margin: 60px 10px 10px;
+        }
+        #article
+        {
+            //border: 10px solid #0000FF;
+            margin: 10px;
+        }
+        #article p {
+            //border: 10px solid #0000FF; 
+            margin: 10px 15px 10px;
+            font-family: Monospace;
+            line-height: 3em;
+            font-size: 2em;
+            width: auto;
+            //display: inline-block;
+            width: auto;
+            word-break: break-all;
+            overflow:hidden
+        }
+        h1 {
+            //text-align: center;
+            font-family: fantasy;
+            font-size: 60px;
+            margin: 30px;
+        }
+    </style>
 <script type="text/javascript" src="common.js"></script>
 <script type="text/javascript" src="jquery-1.8.0.js"></script>
     <script>
@@ -12,7 +41,7 @@
             });
             data = $.parseJSON(htmlobj.responseText);
             data = data.article;
-            html = "<h1>" + data.title + "</h1>" + data.content;
+            html = "<h1>" + data.title + "</h1><div id='article'>" + data.content + "</div>";
             $("#content").html(html);
     });
     </script>

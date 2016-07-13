@@ -47,7 +47,7 @@ page.open(link, function(status){
             top = page.evaluate(get_height); 
             i++;
             page.scrollPosition = {top: top + 1, left: 0};
-            if(i >= 5){
+            if(i >= 8){
                 console.log(page.content);
                 phantom.exit();
             }

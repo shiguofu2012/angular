@@ -37,6 +37,8 @@ def ship_article(art):
     con_list = content.split("\n")
     content = ""
     for con in con_list:
+        if not con or content == ' ':
+            continue
         content += "<p>" + con + "</p>"
     return {"title": title, "content": content, "time": pubDate}
 
