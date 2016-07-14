@@ -10,6 +10,10 @@ def save_pic(pic_list):
     Article.image.insert(pic_list)
 
 
+def update_pic(_id, data):
+    return Article.image.update({"id": _id}, {"$set": data})
+
+
 def get_Articles(skip, count):
     cur = Article.info.find().sort([("_id", -1)]).skip(skip).limit(count)
     return [i for i in cur]

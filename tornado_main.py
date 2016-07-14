@@ -32,7 +32,10 @@ def ship_article(art):
             url = image.get("url")
         else:
             url = ""
-        repStr = "<img src=" + url + ">"
+        if url:
+            repStr = "<img src=" + url + ">"
+        else:
+            repStr = ""
         content = content.replace(PATTERN_STR % img, repStr)
     con_list = content.split("\n")
     content = ""

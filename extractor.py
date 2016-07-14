@@ -61,8 +61,8 @@ def extract_link(dom, template):
                     pic = downPic(pic, name)
                 if pic:
                     break
-            if not pic:
-                print title
+            #if not pic:
+            #    print title
             tmp = {}
             tmp['title'] = title
             tmp['link'] = link
@@ -119,7 +119,6 @@ def extract(dom, template):
     text = text.replace("<", "&lt")
     text = text.replace(">", "&gt")
     article["content"] = text
-    save_pic(pics)
     return article
 
 
@@ -151,7 +150,6 @@ if __name__ == "__main__":
     content = out.read()
     dom = html.fromstring(content)
     links = extract_link(dom, pub_templat)
-    result = []
     for link in links:
         l = link.get("link")
         thum = link.get("thumb", "")
@@ -160,10 +158,11 @@ if __name__ == "__main__":
         article_content = extract(dom, newsTemplate)
         if not thum:
             thum = get_thumbnail(article_content)
+            if not thum:
+                thum = ""
         _id = int(time.time() * 1000)
         article_content.update({"_id": _id, "original_url": l, "image": thum})
-        result.append(article_content)
-    insert(result)
+        insert(article_content)
     #print result.get("pubDate")
     #content = dom.xpath("//div[@id=\"img-content\"]")[0]
     #remove_tag = content.xpath(

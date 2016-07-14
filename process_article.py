@@ -3,8 +3,8 @@ from lxml import html
 import uuid
 import requests
 import os
-PICDIR = "/home/gfshi/github/angular/picture"
-URLPIC = "http://192.168.50.128/angular/picture/"
+from tasks import downPic
+from db.infodb import save_pic
 
 
 def is_para(tag):
@@ -41,37 +41,6 @@ def validate_img(src):
     return True
 
 
-def getSuffix(url):
-    url_list = url.split("/")
-    last = url_list[len(url_list) - 1]
-    index = last.find(".")
-    if index != -1:
-        return url[index + 1:]
-    index = last.find("wx_fmt")
-    if index != -1:
-        return last[index + 7:]
-    else:
-        print url
-        return None
-
-
-def downPic(url, name):
-    resp = requests.get(url)
-    suffix = getSuffix(url)
-    if resp.ok:
-        if not suffix:
-            filepath = os.path.join(PICDIR, name)
-        else:
-            filepath = os.path.join(PICDIR, name + "." + suffix)
-            name = name + "." + suffix
-        f = open(filepath, "w")
-        f.write(resp.content)
-        f.close()
-        return URLPIC + name
-    else:
-        return None
-
-
 def get_pic(dom):
     imgs = dom.findall(".//img")
     if not imgs:
@@ -84,8 +53,9 @@ def get_pic(dom):
         if not src:
             src = img.get("data-src")
         if validate_img(src):
-            pic = downPic(src, uid)
-            result.append({"id": uid, "url": pic, "node": img})
+            r = downPic.delay(src, uid)
+            result.append({"id": uid, "node": img})
+            save_pic({"id": uid})
     return result
 
 
