@@ -11,12 +11,12 @@
     }
     #content a {
         text-decoration:none;
-        font-size: 3.5em;
+        font-size: 3em;
         color: black;
         font-family: Monospace;
         position:absolute;
         left:180px;
-        margin: 20px;
+        margin: 15px 10px 20px;
         width: 510px;
     }
     #day {font-size: 6em;}
@@ -27,7 +27,7 @@
         position: relative;
         left: 20px;
         top: 50px;
-        width: 170px;
+        width: 180px;
     }
     #article {
         //border: 10px solid #0000FF;
@@ -55,8 +55,10 @@
 <script type="text/javascript" src="common.js"></script>
 <script type="text/javascript" src="jquery-1.8.0.js"></script>
     <script>
-        var host = "http://192.168.50.128:8888/article/list";
-        var host_article = "http://192.168.50.128/angular/article.html"
+        //var host = "http://192.168.50.128:8888/article/list";
+        //var host_article = "http://192.168.50.128/angular/article.html"
+        var host = "http://192.168.1.113:8888/article/list";
+        var host_article = "http://192.168.1.113/angular/wsearch/article.html"
         var p = 0, c = 0, send = true;
         function get_data(page, count)
         {
@@ -78,7 +80,8 @@
                 _id = data[i].id;
                 url = host_article + "?id=" + _id;
                 pubdate = data[i].pubDate;
-                pubdate_list = pubdate.split('-')
+                console.log(pubdate);
+                pubdate_list = pubdate.split('-');
                 day = pubdate_list[2]
                 month = pubdate_list[1] + "月"
                 if(last_day == pubdate)

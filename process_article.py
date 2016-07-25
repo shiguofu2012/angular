@@ -3,7 +3,6 @@ from lxml import html
 import uuid
 import requests
 import os
-from tasks import downPic
 from db.infodb import save_pic
 
 
@@ -42,6 +41,7 @@ def validate_img(src):
 
 
 def get_pic(dom):
+    from tasks import downPic
     imgs = dom.findall(".//img")
     if not imgs:
         return []

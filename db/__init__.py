@@ -6,6 +6,6 @@ Article = None
 
 def __init__():
     global Article
-    Article = client.info
+    Article = client.infos
 
 __init__()
