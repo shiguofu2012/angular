@@ -55,9 +55,3 @@ page.open(link, function(status){
         }, 300);
     }
 });
-
-//window.setTimeout(function(){
-//    page.render("a.png");
-//    //console.log(page.content);
-//    phantom.exit();
-//}, 10000);

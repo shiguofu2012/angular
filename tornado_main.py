@@ -76,10 +76,6 @@ class MainHandler(tornado.web.RequestHandler):
 
 class TestHandler(tornado.web.RequestHandler):
     def get(self, cid):
-        try:
-            cid = int(cid)
-        except Exception as e:
-            self.write({"err": -1, "errmsg": e})
         set_default_headers(self)
         art = get_OneArticle(cid)
         art = ship_article(art)
