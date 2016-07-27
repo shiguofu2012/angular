@@ -6,11 +6,14 @@ import sys
 import re
 import urllib
 import urllib2
+import xml.dom.minidom
 
 
 UUIDURL = "https://login.weixin.qq.com/jslogin"
 QRCODEURL = "https://login.weixin.qq.com/l/"
-SCANURL = "https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?tip=%s&uuid=%s&_=%s"
+SCANURL = "https://login.weixin.qq.com" +\
+        "/cgi-bin/mmwebwx-bin/login?tip=%s&uuid=%s&_=%s"
+
 
 class wxBot(object):
     def __init__(self, lang='zh_CN'):
@@ -19,6 +22,8 @@ class wxBot(object):
         self.sid = ''
         self.skey = ''
         self.uri = ''
+        self.base_uri = ''
+        self.pass_ticket = ''
         self.lang = lang
         self.appid = 'wx782c26e4c19acffb'
 
@@ -70,7 +75,9 @@ class wxBot(object):
         elif code == '200':
             print 'scan ok'
             pm = re.search(regex_reuri, data)
-            self.uri = pm.group(1)
+            uri = pm.group(1)
+            self.uri = uri + "&fun=new"
+            self.base_uri = uri[:uri.rfind('/')]
             return True
         else:
             print 'login error'
@@ -78,8 +85,21 @@ class wxBot(object):
 
     def getData(self):
         content = self._get(self.uri)
-        print content
-
+        doc = xml.dom.minidom.parseString(content)
+        root = doc.documentElement
+        for node in root.childNodes:
+            if node.nodeName == 'skey':
+                self.skey = node.childNodes[0].data
+            elif node.nodeName == 'wxsid':
+                self.sid = node.childNodes[0].data
+            elif node.nodeName == 'wxuin':
+                self.uin = node.childNodes[0].data
+            elif node.nodeName == 'pass_ticket':
+                self.pass_ticket = node.childNodes[0].data
+        print self.skey
+        print self.sid
+        print self.uin
+        print self.pass_ticket
 
     def _post(self, url, params, jsonfmt):
         if jsonfmt:
@@ -113,7 +133,6 @@ class wxBot(object):
             self.getData()
         else:
             print "uuid error"
-
 
 
 if __name__ == "__main__":
